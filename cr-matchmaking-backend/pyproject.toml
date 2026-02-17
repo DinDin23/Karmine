@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "cr-matchmaking-backend"
+version = "0.1.0"
+description = "Clash Royale matchmaking platform backend"
+authors = []
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115"
+uvicorn = { version = "^0.34", extras = ["standard"] }
+sqlalchemy = { version = "^2.0", extras = ["asyncio"] }
+asyncpg = "^0.30"
+redis = { version = "^5.0", extras = ["hiredis"] }
+pydantic = "^2.0"
+pydantic-settings = "^2.0"
+python-jose = { version = "^3.3", extras = ["cryptography"] }
+passlib = { version = "^1.7", extras = ["bcrypt"] }
+httpx = "^0.28"
+stripe = "^12.0"
+email-validator = "^2.3.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-asyncio = "^0.25"
+black = "^25.0"
+isort = "^6.0"
+ruff = "^0.9"
+mypy = "^1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 88
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
