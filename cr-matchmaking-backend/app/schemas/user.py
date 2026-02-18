@@ -23,6 +23,13 @@ class LinkCRAccountRequest(BaseModel):
     player_tag: str = Field(pattern=r"^#[A-Z0-9]+$")
 
 
+class LinkCRAccountResponse(BaseModel):
+    player_tag: str
+    player_name: str
+    verification_code: str
+    instructions: str
+
+
 class VerifyCRAccountRequest(BaseModel):
     verification_code: str = Field(min_length=5, max_length=5)
 

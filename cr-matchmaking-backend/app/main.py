@@ -4,16 +4,26 @@ from collections.abc import AsyncGenerator
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from app.config import settings
 from app.database import engine
-from app.routers import auth
+from app.models.base import Base
+from app.routers import auth, users
 from app.utils.exceptions import AppException
 from app.utils.redis_client import close_redis, init_redis
+
+# Import all models so Base.metadata knows about them
+import app.models.user  # noqa: F401
+import app.models.match  # noqa: F401
+import app.models.transaction  # noqa: F401
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup
     await init_redis()
+    if settings.DEBUG:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
     yield
     # Shutdown
     await close_redis()
@@ -42,6 +52,7 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
 
 
 app.include_router(auth.router)
+app.include_router(users.router)
 
 
 @app.get("/health")
