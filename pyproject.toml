@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "karmine"
+version = "0.1.0"
+description = "Clash Royale wagering platform"
+authors = ["Dinesh Polisetty <dineshsp2003@gmail.com>"]
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.0"
+uvicorn = { extras = ["standard"], version = "^0.30.0" }
+pydantic-settings = "^2.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
