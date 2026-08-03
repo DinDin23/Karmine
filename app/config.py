@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 60 * 24
     cr_api_key: str
+    cr_api_url: str = "https://api.clashroyale.com/v1"
+    settlement_poll_interval_seconds: int = 30
 
     class Config:
         env_file = ".env"
