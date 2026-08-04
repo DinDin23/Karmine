@@ -1,0 +1,98 @@
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: system-ui, sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header div {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 1.25rem;
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.card form,
+.card .row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.card .row {
+  flex-direction: row;
+  align-items: center;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+input {
+  padding: 0.4rem;
+  font-size: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  text-decoration: underline;
+  padding: 0.5rem 0;
+}
+
+.error {
+  color: #e05555;
+}
+
+.balance {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.matched {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.list li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #333;
+}
