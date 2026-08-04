@@ -13,7 +13,6 @@ class WagerStatus(str, enum.Enum):
     MATCHED = "matched"
     AWAITING_RESULT = "awaiting_result"
     SETTLED = "settled"
-    DISPUTED = "disputed"
     CANCELLED = "cancelled"
 
 
