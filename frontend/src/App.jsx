@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AuthForm from "./AuthForm";
+import UserStats from "./UserStats";
 import Wallet from "./Wallet";
 import Matchmaking from "./Matchmaking";
 import WagerHistory from "./WagerHistory";
@@ -51,10 +52,15 @@ function App() {
           <button onClick={handleLogout}>Log out</button>
         </div>
       </header>
-      <div className="grid">
-        <Wallet />
-        <Matchmaking onMatched={() => setWagerRefreshKey((k) => k + 1)} />
-        <WagerHistory refreshKey={wagerRefreshKey} />
+      <div className="layout">
+        <div className="column">
+          <UserStats userId={user.id} refreshKey={wagerRefreshKey} />
+          <Wallet />
+        </div>
+        <div className="column">
+          <Matchmaking onMatched={() => setWagerRefreshKey((k) => k + 1)} />
+          <WagerHistory refreshKey={wagerRefreshKey} />
+        </div>
       </div>
     </div>
   );
