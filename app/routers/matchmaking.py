@@ -1,6 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    WebSocket,
+    WebSocketDisconnect,
+    status,
+)
 from sqlalchemy.orm import Session
 
+from app.core.security import decode_access_token
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.matchmaking_request import MatchmakingRequest, MatchmakingStatus
@@ -9,6 +17,7 @@ from app.models.user import User
 from app.models.wager import Wager
 from app.routers.wallet import get_balance
 from app.schemas.matchmaking import MatchmakingStatusOut, QueueRequest
+from app.services import connection_manager
 
 router = APIRouter(prefix="/matchmaking", tags=["matchmaking"])
 
@@ -113,6 +122,18 @@ def queue(
 
     db.commit()
     db.refresh(my_request)
+
+    if opponent_request is not None and opponent_request.wager_id is not None:
+        opponent_payload = MatchmakingStatusOut(
+            id=opponent_request.id,
+            status=opponent_request.status,
+            stake_amount=opponent_request.stake_amount,
+            wager_id=opponent_request.wager_id,
+            opponent_id=current_user.id,
+            created_at=opponent_request.created_at,
+        ).model_dump(mode="json")
+        connection_manager.notify(opponent_request.user_id, opponent_payload)
+
     return _to_status_out(my_request, current_user.id, db)
 
 
@@ -157,3 +178,28 @@ def get_status(
         )
 
     return _to_status_out(latest, current_user.id, db)
+
+
+@router.websocket("/ws")
+async def matchmaking_ws(websocket: WebSocket, token: str, db: Session = Depends(get_db)):
+    try:
+        payload = decode_access_token(token)
+        user_id = int(payload["sub"])
+    except Exception:
+        await websocket.close(code=4001)
+        return
+
+    user = db.get(User, user_id)
+    if user is None:
+        await websocket.close(code=4001)
+        return
+
+    await websocket.accept()
+    connection_manager.register(user_id, websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        pass
+    finally:
+        connection_manager.unregister(user_id, websocket)
