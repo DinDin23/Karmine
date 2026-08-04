@@ -14,3 +14,7 @@ venv/
 
 # OS
 .DS_Store
+
+# dev.sh runtime artifacts
+.dev-pids/
+.dev-logs/
