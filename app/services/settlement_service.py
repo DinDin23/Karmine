@@ -18,8 +18,19 @@ def _parse_battle_time(battle_time: str) -> datetime:
     )
 
 
+def _remaining_tower_hp(side: dict) -> int:
+    """Sum of remaining tower HP. The API omits a tower's HP field entirely once it's destroyed."""
+    king_hp = side.get("kingTowerHitPoints", 0)
+    princess_hp = sum(side.get("princessTowersHitPoints", []))
+    return king_hp + princess_hp
+
+
 def _find_result(battlelog: list[dict], opponent_tag: str, after: datetime) -> str | None:
-    """Return 'team' or 'opponent' for the crown-winning side, 'draw', or None if no match found."""
+    """Return 'team' or 'opponent' for the winning side, or None if no match found yet.
+
+    Crowns decide the winner in regulation. If crowns are tied, the battle went to
+    overtime, where remaining tower HP is the real tiebreaker (CR never ends in a true draw).
+    """
     for battle in battlelog:
         if battle.get("type") != "PvP":
             continue
@@ -29,13 +40,19 @@ def _find_result(battlelog: list[dict], opponent_tag: str, after: datetime) -> s
         if not any(o.get("tag") == opponent_tag for o in opponents):
             continue
 
-        team_crowns = battle["team"][0]["crowns"]
-        opponent_crowns = battle["opponent"][0]["crowns"]
-        if team_crowns > opponent_crowns:
-            return "team"
-        if opponent_crowns > team_crowns:
-            return "opponent"
-        return "draw"
+        team, opponent = battle["team"][0], battle["opponent"][0]
+        team_crowns, opponent_crowns = team["crowns"], opponent["crowns"]
+        if team_crowns != opponent_crowns:
+            return "team" if team_crowns > opponent_crowns else "opponent"
+
+        team_hp, opponent_hp = _remaining_tower_hp(team), _remaining_tower_hp(opponent)
+        if team_hp == opponent_hp:
+            raise ValueError(
+                f"Battle at {battle['battleTime']} tied on both crowns "
+                f"({team_crowns}-{opponent_crowns}) and tower HP "
+                f"({team_hp}-{opponent_hp}) — this shouldn't be possible in a 1v1 ladder match"
+            )
+        return "team" if team_hp > opponent_hp else "opponent"
 
     return None
 
@@ -52,11 +69,6 @@ def settle_wager(db: Session, wager: Wager) -> None:
     result = _find_result(battlelog, player2.cr_player_tag, wager.created_at)
 
     if result is None:
-        return
-
-    if result == "draw":
-        wager.status = WagerStatus.DISPUTED
-        db.commit()
         return
 
     winner = player1 if result == "team" else player2
