@@ -77,6 +77,14 @@ export default function Matchmaking({ onMatched }) {
             {status.stake_amount}
           </p>
           <p>Check your texts for your opponent's Clash Royale friend link.</p>
+          {status.opponent_supercell_link && (
+            <p>
+              Or add them directly:{" "}
+              <a href={status.opponent_supercell_link} target="_blank" rel="noreferrer">
+                {status.opponent_supercell_link}
+              </a>
+            </p>
+          )}
         </div>
       )}
       {error && <p className="error">{error}</p>}

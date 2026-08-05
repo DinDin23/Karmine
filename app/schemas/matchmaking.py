@@ -16,6 +16,7 @@ class MatchmakingStatusOut(BaseModel):
     stake_amount: Decimal
     wager_id: int | None
     opponent_id: int | None
+    opponent_supercell_link: str | None = None
     created_at: datetime
 
     class Config:

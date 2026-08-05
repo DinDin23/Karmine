@@ -26,11 +26,13 @@ def _to_status_out(
     request: MatchmakingRequest, current_user_id: int, db: Session
 ) -> MatchmakingStatusOut:
     opponent_id = None
+    opponent_supercell_link = None
     if request.wager_id is not None:
         wager = db.get(Wager, request.wager_id)
         opponent_id = (
             wager.player2_id if wager.player1_id == current_user_id else wager.player1_id
         )
+        opponent_supercell_link = db.get(User, opponent_id).supercell_id_link
 
     return MatchmakingStatusOut(
         id=request.id,
@@ -38,6 +40,7 @@ def _to_status_out(
         stake_amount=request.stake_amount,
         wager_id=request.wager_id,
         opponent_id=opponent_id,
+        opponent_supercell_link=opponent_supercell_link,
         created_at=request.created_at,
     )
 
@@ -130,6 +133,7 @@ def queue(
             stake_amount=opponent_request.stake_amount,
             wager_id=opponent_request.wager_id,
             opponent_id=current_user.id,
+            opponent_supercell_link=current_user.supercell_id_link,
             created_at=opponent_request.created_at,
         ).model_dump(mode="json")
         connection_manager.notify(opponent_request.user_id, opponent_payload)
