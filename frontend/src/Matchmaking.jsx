@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { cancelQueue, getMatchmakingStatus, matchmakingSocketUrl, queueMatch } from "./api";
 
+function formatElapsed(seconds) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
 export default function Matchmaking({ onMatched }) {
   const [stake, setStake] = useState("10");
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
+  const [elapsed, setElapsed] = useState(0);
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -12,6 +19,16 @@ export default function Matchmaking({ onMatched }) {
       .then(setStatus)
       .catch(() => setStatus(null));
   }, []);
+
+  useEffect(() => {
+    if (status?.status !== "waiting") {
+      setElapsed(0);
+      return;
+    }
+    setElapsed(0);
+    const interval = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [status?.status]);
 
   useEffect(() => {
     if (status?.status !== "waiting") {
@@ -67,7 +84,18 @@ export default function Matchmaking({ onMatched }) {
         </div>
       ) : status.status === "waiting" ? (
         <div>
-          <p>Waiting for an opponent at ${status.stake_amount}...</p>
+          <div className="searching">
+            <span className="spinner" />
+            <span>
+              Searching for an opponent at ${status.stake_amount}
+              <span className="dots">
+                <span>.</span>
+                <span>.</span>
+                <span>.</span>
+              </span>
+            </span>
+          </div>
+          <p className="elapsed">{formatElapsed(elapsed)} elapsed</p>
           <button onClick={handleCancel}>Cancel</button>
         </div>
       ) : (
