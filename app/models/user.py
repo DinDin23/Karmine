@@ -14,6 +14,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String(255))
     cr_player_tag: Mapped[str] = mapped_column(String(16), unique=True, index=True)
+    phone_number: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    supercell_id_link: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

@@ -76,6 +76,7 @@ export default function Matchmaking({ onMatched }) {
             Matched! Opponent #{status.opponent_id}, wager #{status.wager_id}, stake $
             {status.stake_amount}
           </p>
+          <p>Check your texts for your opponent's Clash Royale friend link.</p>
         </div>
       )}
       {error && <p className="error">{error}</p>}

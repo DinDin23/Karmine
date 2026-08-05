@@ -21,6 +21,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
                 User.email == payload.email,
                 User.username == payload.username,
                 User.cr_player_tag == payload.cr_player_tag,
+                User.phone_number == payload.phone_number,
             )
         )
         .first()
@@ -28,7 +29,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
     if existing is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Username, email, or CR player tag already registered",
+            detail="Username, email, CR player tag, or phone number already registered",
         )
 
     user = User(
@@ -36,6 +37,8 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
         email=payload.email,
         hashed_password=hash_password(payload.password),
         cr_player_tag=payload.cr_player_tag,
+        phone_number=payload.phone_number,
+        supercell_id_link=payload.supercell_id_link,
     )
     db.add(user)
     db.commit()

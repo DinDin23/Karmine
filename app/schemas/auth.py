@@ -8,6 +8,8 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     cr_player_tag: str
+    phone_number: str
+    supercell_id_link: str
 
 
 class UserOut(BaseModel):
@@ -15,6 +17,8 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     cr_player_tag: str
+    phone_number: str
+    supercell_id_link: str
     created_at: datetime
 
     class Config:

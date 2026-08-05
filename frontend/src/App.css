@@ -88,6 +88,12 @@ button {
   color: #e05555;
 }
 
+.sms-consent {
+  font-size: 0.8rem;
+  color: #888;
+  margin: -0.3rem 0 0;
+}
+
 .balance {
   font-size: 1.4rem;
   font-weight: bold;

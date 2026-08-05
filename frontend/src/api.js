@@ -34,11 +34,25 @@ async function request(path, options = {}) {
   return response.json();
 }
 
-export function register({ username, email, password, cr_player_tag }) {
+export function register({
+  username,
+  email,
+  password,
+  cr_player_tag,
+  phone_number,
+  supercell_id_link,
+}) {
   return request("/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password, cr_player_tag }),
+    body: JSON.stringify({
+      username,
+      email,
+      password,
+      cr_player_tag,
+      phone_number,
+      supercell_id_link,
+    }),
   });
 }
 

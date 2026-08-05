@@ -17,7 +17,7 @@ from app.models.user import User
 from app.models.wager import Wager
 from app.routers.wallet import get_balance
 from app.schemas.matchmaking import MatchmakingStatusOut, QueueRequest
-from app.services import connection_manager
+from app.services import connection_manager, sms_service
 
 router = APIRouter(prefix="/matchmaking", tags=["matchmaking"])
 
@@ -133,6 +133,10 @@ def queue(
             created_at=opponent_request.created_at,
         ).model_dump(mode="json")
         connection_manager.notify(opponent_request.user_id, opponent_payload)
+
+        opponent_user = db.get(User, opponent_request.user_id)
+        sms_service.send_match_invite(current_user, opponent_user)
+        sms_service.send_match_invite(opponent_user, current_user)
 
     return _to_status_out(my_request, current_user.id, db)
 
