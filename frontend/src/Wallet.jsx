@@ -57,14 +57,18 @@ export default function Wallet() {
       </div>
       {error && <p className="error">{error}</p>}
       <h3>Transactions</h3>
-      <ul className="list">
-        {transactions.map((tx) => (
-          <li key={tx.id}>
-            {tx.type} — {tx.amount > 0 ? "+" : ""}
-            {tx.amount} ({new Date(tx.created_at).toLocaleString()})
-          </li>
-        ))}
-      </ul>
+      {transactions.length === 0 ? (
+        <p className="empty-state">No transactions yet.</p>
+      ) : (
+        <ul className="list">
+          {transactions.map((tx) => (
+            <li key={tx.id}>
+              {tx.type} — {tx.amount > 0 ? "+" : ""}
+              {tx.amount} ({new Date(tx.created_at).toLocaleString()})
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

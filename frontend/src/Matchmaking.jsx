@@ -70,7 +70,7 @@ export default function Matchmaking({ onMatched }) {
 
   return (
     <div className="card">
-      <h2>Matchmaking</h2>
+      <h2>Clash Royale Matchmaking</h2>
       {!status || status.status === "cancelled" ? (
         <div className="row">
           <input

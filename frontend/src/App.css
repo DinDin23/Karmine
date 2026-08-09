@@ -1,21 +1,93 @@
 .app {
-  max-width: 960px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem 1.5rem 4rem;
   font-family: system-ui, sans-serif;
+  text-align: left;
+}
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4rem;
+}
+
+.landing-hero {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.landing-hero h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+}
+
+.eyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 0.5rem;
+}
+
+.logo-mark {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.4rem;
+  vertical-align: -0.1em;
+  color: var(--accent);
+}
+
+.tagline {
+  color: var(--text);
+  font-size: 1.05rem;
+  margin: 0 0 1.5rem;
+}
+
+.landing .card {
+  width: 100%;
+  max-width: 420px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
 }
 
-.header div {
+.header h1 {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.user-badge {
   display: flex;
   gap: 0.75rem;
   align-items: center;
+}
+
+.avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .layout {
@@ -32,16 +104,18 @@
   min-width: 0;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
   .layout {
     grid-template-columns: 1fr;
   }
 }
 
 .card {
-  border: 1px solid #444;
-  border-radius: 8px;
-  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: var(--bg);
+  box-shadow: var(--shadow);
 }
 
 .card h2 {
@@ -60,6 +134,15 @@
   align-items: center;
 }
 
+.card .row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.card .row button {
+  flex-shrink: 0;
+}
+
 label {
   display: flex;
   flex-direction: column;
@@ -68,13 +151,40 @@ label {
 }
 
 input {
-  padding: 0.4rem;
+  padding: 0.5rem 0.6rem;
   font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent-border);
 }
 
 button {
   padding: 0.5rem 1rem;
   cursor: pointer;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: background 0.15s ease;
+}
+
+button:hover {
+  background: var(--accent-border);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .link-button {
@@ -82,6 +192,7 @@ button {
   border: none;
   text-decoration: underline;
   padding: 0.5rem 0;
+  color: var(--text);
 }
 
 .error {
@@ -90,14 +201,18 @@ button {
 
 .sms-consent {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text);
+  opacity: 0.75;
   margin: -0.3rem 0 0;
 }
 
 .balance {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 0 0 1rem;
 }
+
 
 .matched {
   color: #4caf50;
@@ -113,8 +228,8 @@ button {
 .spinner {
   width: 1.1rem;
   height: 1.1rem;
-  border: 2px solid #444;
-  border-top-color: #4caf50;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
   border-radius: 50%;
   flex-shrink: 0;
   animation: spin 0.8s linear infinite;
@@ -156,7 +271,8 @@ button {
 
 .elapsed {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text);
+  opacity: 0.75;
   margin: 0.4rem 0 0.8rem;
 }
 
@@ -164,11 +280,24 @@ button {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
 }
 
 .list li {
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #333;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
 }
+
+.list li:last-child {
+  border-bottom: none;
+}
+
+.empty-state {
+  color: var(--text);
+  opacity: 0.6;
+  font-size: 0.9rem;
+  padding: 0.75rem 0;
+}
+

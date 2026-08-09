@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AuthForm from "./AuthForm";
+import Logo from "./Logo";
 import UserStats from "./UserStats";
 import Wallet from "./Wallet";
 import Matchmaking from "./Matchmaking";
@@ -36,8 +37,14 @@ function App() {
 
   if (!user) {
     return (
-      <div className="app">
-        <h1>Karmine</h1>
+      <div className="app landing">
+        <div className="landing-hero">
+          <p className="eyebrow">Clash Royale Wagering</p>
+          <h1>
+            <Logo className="logo-mark" /> Karmine
+          </h1>
+          <p className="tagline">Wager on your Clash Royale 1v1s. Queue up, get matched, get paid.</p>
+        </div>
         <AuthForm onAuthenticated={handleAuthenticated} />
       </div>
     );
@@ -46,8 +53,11 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Karmine</h1>
-        <div>
+        <h1>
+          <Logo className="logo-mark" /> Karmine
+        </h1>
+        <div className="user-badge">
+          <span className="avatar">{user.username.slice(0, 1).toUpperCase()}</span>
           <span>{user.username}</span>
           <button onClick={handleLogout}>Log out</button>
         </div>
@@ -56,10 +66,10 @@ function App() {
         <div className="column">
           <UserStats userId={user.id} refreshKey={wagerRefreshKey} />
           <Wallet />
+          <WagerHistory refreshKey={wagerRefreshKey} />
         </div>
         <div className="column">
           <Matchmaking onMatched={() => setWagerRefreshKey((k) => k + 1)} />
-          <WagerHistory refreshKey={wagerRefreshKey} />
         </div>
       </div>
     </div>
