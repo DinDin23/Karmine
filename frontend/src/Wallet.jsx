@@ -7,6 +7,9 @@ export default function Wallet() {
   const [amount, setAmount] = useState("");
   const [error, setError] = useState(null);
 
+  const parsedAmount = Number(amount);
+  const isValidAmount = amount.trim() !== "" && Number.isFinite(parsedAmount) && parsedAmount > 0;
+
   async function refresh() {
     const [balanceData, txData] = await Promise.all([getBalance(), getTransactions()]);
     setBalance(balanceData.balance);
@@ -18,9 +21,10 @@ export default function Wallet() {
   }, []);
 
   async function handleDeposit() {
+    if (!isValidAmount) return;
     setError(null);
     try {
-      await deposit(Number(amount));
+      await deposit(parsedAmount);
       setAmount("");
       await refresh();
     } catch (err) {
@@ -29,9 +33,10 @@ export default function Wallet() {
   }
 
   async function handleWithdraw() {
+    if (!isValidAmount) return;
     setError(null);
     try {
-      await withdraw(Number(amount));
+      await withdraw(parsedAmount);
       setAmount("");
       await refresh();
     } catch (err) {
@@ -52,9 +57,16 @@ export default function Wallet() {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
         />
-        <button onClick={handleDeposit}>Deposit</button>
-        <button onClick={handleWithdraw}>Withdraw</button>
+        <button onClick={handleDeposit} disabled={!isValidAmount}>
+          Deposit
+        </button>
+        <button onClick={handleWithdraw} disabled={!isValidAmount}>
+          Withdraw
+        </button>
       </div>
+      {amount.trim() !== "" && !isValidAmount && (
+        <p className="error">Enter an amount greater than 0.</p>
+      )}
       {error && <p className="error">{error}</p>}
       <h3>Transactions</h3>
       {transactions.length === 0 ? (
