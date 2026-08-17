@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     twilio_api_key_sid: str
     twilio_api_key_secret: str
     twilio_from_number: str
+    cors_allow_origins: str = "http://localhost:5173"
 
     class Config:
         env_file = ".env"
