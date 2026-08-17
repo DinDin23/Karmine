@@ -18,3 +18,4 @@ venv/
 # dev.sh runtime artifacts
 .dev-pids/
 .dev-logs/
+.env.test
