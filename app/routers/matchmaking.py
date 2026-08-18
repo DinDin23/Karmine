@@ -18,31 +18,9 @@ from app.models.wager import Wager
 from app.routers.wallet import get_balance
 from app.schemas.matchmaking import MatchmakingStatusOut, QueueRequest
 from app.services import connection_manager, sms_service
+from app.services.matchmaking_status import build_status_out
 
 router = APIRouter(prefix="/matchmaking", tags=["matchmaking"])
-
-
-def _to_status_out(
-    request: MatchmakingRequest, current_user_id: int, db: Session
-) -> MatchmakingStatusOut:
-    opponent_id = None
-    opponent_supercell_link = None
-    if request.wager_id is not None:
-        wager = db.get(Wager, request.wager_id)
-        opponent_id = (
-            wager.player2_id if wager.player1_id == current_user_id else wager.player1_id
-        )
-        opponent_supercell_link = db.get(User, opponent_id).supercell_id_link
-
-    return MatchmakingStatusOut(
-        id=request.id,
-        status=request.status,
-        stake_amount=request.stake_amount,
-        wager_id=request.wager_id,
-        opponent_id=opponent_id,
-        opponent_supercell_link=opponent_supercell_link,
-        created_at=request.created_at,
-    )
 
 
 @router.post("/queue", response_model=MatchmakingStatusOut)
@@ -127,14 +105,8 @@ def queue(
     db.refresh(my_request)
 
     if opponent_request is not None and opponent_request.wager_id is not None:
-        opponent_payload = MatchmakingStatusOut(
-            id=opponent_request.id,
-            status=opponent_request.status,
-            stake_amount=opponent_request.stake_amount,
-            wager_id=opponent_request.wager_id,
-            opponent_id=current_user.id,
-            opponent_supercell_link=current_user.supercell_id_link,
-            created_at=opponent_request.created_at,
+        opponent_payload = build_status_out(
+            opponent_request, opponent_request.user_id, db
         ).model_dump(mode="json")
         connection_manager.notify(opponent_request.user_id, opponent_payload)
 
@@ -142,7 +114,7 @@ def queue(
         sms_service.send_match_invite(current_user, opponent_user)
         sms_service.send_match_invite(opponent_user, current_user)
 
-    return _to_status_out(my_request, current_user.id, db)
+    return build_status_out(my_request, current_user.id, db)
 
 
 @router.delete("/queue", status_code=status.HTTP_204_NO_CONTENT)
@@ -185,7 +157,7 @@ def get_status(
             detail="No matchmaking history",
         )
 
-    return _to_status_out(latest, current_user.id, db)
+    return build_status_out(latest, current_user.id, db)
 
 
 @router.websocket("/ws")

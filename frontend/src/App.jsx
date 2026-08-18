@@ -69,7 +69,10 @@ function App() {
           <WagerHistory refreshKey={wagerRefreshKey} />
         </div>
         <div className="column">
-          <Matchmaking onMatched={() => setWagerRefreshKey((k) => k + 1)} />
+          <Matchmaking
+            userId={user.id}
+            onWagerUpdated={() => setWagerRefreshKey((k) => k + 1)}
+          />
         </div>
       </div>
     </div>
