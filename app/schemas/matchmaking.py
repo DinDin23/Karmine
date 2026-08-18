@@ -4,6 +4,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field
 
 from app.models.matchmaking_request import MatchmakingStatus
+from app.models.wager import WagerStatus
 
 
 class QueueRequest(BaseModel):
@@ -17,6 +18,8 @@ class MatchmakingStatusOut(BaseModel):
     wager_id: int | None
     opponent_id: int | None
     opponent_supercell_link: str | None = None
+    wager_status: WagerStatus | None = None
+    winner_id: int | None = None
     created_at: datetime
 
     class Config:

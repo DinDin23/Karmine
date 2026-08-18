@@ -4,7 +4,7 @@ import time
 
 from app.config import settings
 from app.database import SessionLocal
-from app.services.settlement_service import poll_and_settle
+from app.services.settlement_service import expire_stale_wagers, poll_and_settle
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +15,10 @@ def _run() -> None:
     while not _stop_event.is_set():
         db = SessionLocal()
         try:
+            # Settle first: a wager whose game just finished should be scored off
+            # the real result, not cancelled, even if it's past the timeout cutoff.
             poll_and_settle(db)
+            expire_stale_wagers(db)
         except Exception:
             logger.exception("Settlement poll loop failed")
         finally:

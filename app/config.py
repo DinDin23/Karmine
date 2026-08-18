@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     cr_api_key: str
     cr_api_url: str = "https://api.clashroyale.com/v1"
     settlement_poll_interval_seconds: int = 30
+    match_timeout_minutes: int = 15
     twilio_account_sid: str
     twilio_api_key_sid: str
     twilio_api_key_secret: str

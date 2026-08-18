@@ -1,13 +1,17 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
+from app.config import settings
+from app.models.matchmaking_request import MatchmakingRequest
 from app.models.transaction import Transaction, TransactionType
 from app.models.user import User
 from app.models.wager import Wager, WagerStatus
+from app.services import connection_manager
 from app.services.cr_api_service import get_battlelog
+from app.services.matchmaking_status import build_status_out
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +66,23 @@ def _find_result(battlelog: list[dict], opponent_tag: str, after: datetime) -> s
     return None
 
 
+def _notify_players(db: Session, wager: Wager) -> None:
+    """Push the current status to both players' matchmaking widgets, if connected.
+
+    Used once a wager reaches a terminal state (settled or expired/cancelled) so the
+    frontend can show the result and revert out of the "matched" panel live, instead
+    of only finding out on the next page load.
+    """
+    requests = (
+        db.query(MatchmakingRequest)
+        .filter(MatchmakingRequest.wager_id == wager.id)
+        .all()
+    )
+    for request in requests:
+        payload = build_status_out(request, request.user_id, db).model_dump(mode="json")
+        connection_manager.notify(request.user_id, payload)
+
+
 def settle_wager(db: Session, wager: Wager) -> None:
     if wager.status == WagerStatus.MATCHED:
         wager.status = WagerStatus.AWAITING_RESULT
@@ -90,6 +111,7 @@ def settle_wager(db: Session, wager: Wager) -> None:
         )
     )
     db.commit()
+    _notify_players(db, wager)
 
 
 def poll_and_settle(db: Session) -> None:
@@ -104,3 +126,44 @@ def poll_and_settle(db: Session) -> None:
         except Exception:
             db.rollback()
             logger.exception("Failed to settle wager %s", wager.id)
+
+
+def _expire_wager(db: Session, wager: Wager) -> None:
+    wager.status = WagerStatus.CANCELLED
+    wager.settled_at = datetime.now(timezone.utc)
+
+    for player_id in (wager.player1_id, wager.player2_id):
+        db.add(
+            Transaction(
+                user_id=player_id,
+                wager_id=wager.id,
+                type=TransactionType.WAGER_REFUND,
+                amount=wager.stake_amount,
+            )
+        )
+    db.commit()
+    _notify_players(db, wager)
+
+
+def expire_stale_wagers(db: Session) -> None:
+    """Cancel + refund matches that were made but never finished within the timeout.
+
+    Runs alongside poll_and_settle on the same worker tick, so a wager that never
+    turns up a qualifying battle in the CR API doesn't sit MATCHED/AWAITING_RESULT
+    forever.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=settings.match_timeout_minutes)
+    wagers = (
+        db.query(Wager)
+        .filter(
+            Wager.status.in_([WagerStatus.MATCHED, WagerStatus.AWAITING_RESULT]),
+            Wager.created_at < cutoff,
+        )
+        .all()
+    )
+    for wager in wagers:
+        try:
+            _expire_wager(db, wager)
+        except Exception:
+            db.rollback()
+            logger.exception("Failed to expire wager %s", wager.id)
