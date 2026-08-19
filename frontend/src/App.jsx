@@ -12,6 +12,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [wagerRefreshKey, setWagerRefreshKey] = useState(0);
+  const [balanceRefreshKey, setBalanceRefreshKey] = useState(0);
 
   useEffect(() => {
     if (!getToken()) {
@@ -65,13 +66,17 @@ function App() {
       <div className="layout">
         <div className="column">
           <UserStats userId={user.id} refreshKey={wagerRefreshKey} />
-          <Wallet />
+          <Wallet onBalanceChanged={() => setBalanceRefreshKey((k) => k + 1)} />
           <WagerHistory refreshKey={wagerRefreshKey} />
         </div>
         <div className="column">
           <Matchmaking
             userId={user.id}
-            onWagerUpdated={() => setWagerRefreshKey((k) => k + 1)}
+            balanceRefreshKey={balanceRefreshKey}
+            onWagerUpdated={() => {
+              setWagerRefreshKey((k) => k + 1);
+              setBalanceRefreshKey((k) => k + 1);
+            }}
           />
         </div>
       </div>

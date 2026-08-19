@@ -143,6 +143,32 @@
   flex-shrink: 0;
 }
 
+.tier-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.tier-btn {
+  min-width: 3.5rem;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+}
+
+.tier-btn.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.balance-hint {
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.75;
+  margin: 0 0 0.6rem;
+}
+
 label {
   display: flex;
   flex-direction: column;

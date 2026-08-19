@@ -1,9 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { cancelQueue, getMatchmakingStatus, matchmakingSocketUrl, queueMatch } from "./api";
+import {
+  cancelQueue,
+  getBalance,
+  getMatchmakingStatus,
+  matchmakingSocketUrl,
+  queueMatch,
+} from "./api";
 import Tooltip from "./Tooltip";
 
 const POLL_INTERVAL_MS = 20000;
 const REVERT_DELAY_MS = 5000;
+const TIERS = [1, 5, 10, 20, 50];
+const DEFAULT_TIER = 5;
 
 function formatElapsed(seconds) {
   const m = Math.floor(seconds / 60);
@@ -19,12 +27,16 @@ function isInProgress(matchStatus, wagerStatus) {
   return matchStatus === "matched" && !isTerminalWagerStatus(wagerStatus);
 }
 
-export default function Matchmaking({ userId, onWagerUpdated }) {
-  const [stake, setStake] = useState("10");
+export default function Matchmaking({ userId, balanceRefreshKey, onWagerUpdated }) {
+  const [selectedTier, setSelectedTier] = useState(null);
+  const [balance, setBalance] = useState(null);
   const [status, setStatus] = useState(null);
   const [error, setError] = useState(null);
   const [elapsed, setElapsed] = useState(0);
   const socketRef = useRef(null);
+  // Guards the one-time default-tier selection below so it only ever fires
+  // once balance first loads, and never overrides a user's own click.
+  const defaultedRef = useRef(false);
   // Tracks the previously-seen {status, wagerStatus} so the transition effect
   // below can tell a *live* match/settle/expire event apart from just loading
   // an already-resolved request on mount (which should resume silently, with
@@ -47,6 +59,24 @@ export default function Matchmaking({ userId, onWagerUpdated }) {
       })
       .catch(() => setStatus(null));
   }, []);
+
+  // Refetches on mount and whenever the parent bumps balanceRefreshKey (after
+  // a deposit/withdraw in the Wallet card, or a wager settling/expiring here)
+  // -- otherwise a stale balance would leave tiers wrongly enabled/disabled.
+  useEffect(() => {
+    getBalance()
+      .then((data) => setBalance(Number(data.balance)))
+      .catch(() => setBalance(null));
+  }, [balanceRefreshKey]);
+
+  // Pre-select the default tier once balance first loads, but only if it's
+  // affordable -- otherwise leave nothing selected so Queue stays disabled
+  // until the user picks a tier they can actually afford.
+  useEffect(() => {
+    if (balance === null || defaultedRef.current) return;
+    defaultedRef.current = true;
+    if (balance >= DEFAULT_TIER) setSelectedTier(DEFAULT_TIER);
+  }, [balance]);
 
   // Detects live transitions (via WS push or the polling fallback below) into
   // "just matched" or "just resolved" and reacts: bump the wager refresh
@@ -113,9 +143,10 @@ export default function Matchmaking({ userId, onWagerUpdated }) {
   }, [status?.status, status?.wager_status]);
 
   async function handleQueue() {
+    if (!selectedTier) return;
     setError(null);
     try {
-      const result = await queueMatch(Number(stake));
+      const result = await queueMatch(selectedTier);
       setStatus(result);
     } catch (err) {
       setError(err.message);
@@ -134,20 +165,36 @@ export default function Matchmaking({ userId, onWagerUpdated }) {
 
   const wagerStatus = status?.wager_status ?? null;
   const resolved = status?.status === "matched" && isTerminalWagerStatus(wagerStatus);
+  // Re-checked against the latest balance on every render -- not just at
+  // selection time -- so a withdrawal after picking a tier can't leave a
+  // now-unaffordable tier still queueable.
+  const canAffordSelected =
+    selectedTier !== null && balance !== null && balance >= selectedTier;
 
   return (
     <div className="card">
       <h2>Clash Royale Matchmaking</h2>
       {!status || status.status === "cancelled" ? (
-        <div className="row">
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={stake}
-            onChange={(e) => setStake(e.target.value)}
-          />
-          <button onClick={handleQueue}>Queue</button>
+        <div>
+          {balance !== null && <p className="balance-hint">Balance: ${balance}</p>}
+          <div className="tier-row">
+            {TIERS.map((tier) => (
+              <button
+                key={tier}
+                type="button"
+                className={selectedTier === tier ? "tier-btn selected" : "tier-btn"}
+                disabled={balance === null || balance < tier}
+                onClick={() => setSelectedTier(tier)}
+              >
+                ${tier}
+              </button>
+            ))}
+          </div>
+          <div className="row">
+            <button onClick={handleQueue} disabled={!canAffordSelected}>
+              Queue
+            </button>
+          </div>
         </div>
       ) : status.status === "waiting" ? (
         <div>

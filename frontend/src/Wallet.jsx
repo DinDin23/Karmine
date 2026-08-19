@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { deposit, getBalance, getTransactions, withdraw } from "./api";
 
-export default function Wallet() {
+export default function Wallet({ onBalanceChanged }) {
   const [balance, setBalance] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [amount, setAmount] = useState("");
@@ -27,6 +27,7 @@ export default function Wallet() {
       await deposit(parsedAmount);
       setAmount("");
       await refresh();
+      onBalanceChanged?.();
     } catch (err) {
       setError(err.message);
     }
@@ -39,6 +40,7 @@ export default function Wallet() {
       await withdraw(parsedAmount);
       setAmount("");
       await refresh();
+      onBalanceChanged?.();
     } catch (err) {
       setError(err.message);
     }

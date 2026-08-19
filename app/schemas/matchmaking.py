@@ -1,14 +1,24 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, field_validator
 
 from app.models.matchmaking_request import MatchmakingStatus
 from app.models.wager import WagerStatus
 
+STAKE_TIERS = (Decimal("1"), Decimal("5"), Decimal("10"), Decimal("20"), Decimal("50"))
+
 
 class QueueRequest(BaseModel):
-    stake_amount: Decimal = Field(gt=0)
+    stake_amount: Decimal
+
+    @field_validator("stake_amount")
+    @classmethod
+    def validate_stake_tier(cls, v: Decimal) -> Decimal:
+        if v not in STAKE_TIERS:
+            tiers = ", ".join(str(tier) for tier in STAKE_TIERS)
+            raise ValueError(f"Stake amount must be one of: {tiers}")
+        return v
 
 
 class MatchmakingStatusOut(BaseModel):
