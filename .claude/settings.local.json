@@ -9,7 +9,8 @@
       "Bash(find */PersonalProjects/Karmine/* -exec rm *)",
       "Bash(*)",
       "WebSearch",
-      "WebFetch(*)"
+      "WebFetch(*)",
+      "Skill(update-config)"
     ],
     "deny": [
       "Bash(rm *)",
@@ -24,7 +25,6 @@
       "Bash(mkfs.*)",
       "Bash(fdisk *)",
       "Bash(parted *)",
-      "Bash(git push*)",
       "Bash(shutdown*)",
       "Bash(reboot*)",
       "Bash(init *)",
@@ -33,6 +33,21 @@
       "Bash(shred *)",
       "Bash(truncate -s 0 *)",
       "> /dev/*"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Bash(git push*)",
+            "command": "/home/dindin23/PersonalProjects/Karmine/.claude/hooks/post-push-claude-md-check.sh",
+            "statusMessage": "Checking CLAUDE.md against pushed changes..."
+          }
+        ]
+      }
     ]
   }
 }
