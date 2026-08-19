@@ -1,0 +1,17 @@
+[Unit]
+Description=Karmine backend (FastAPI/uvicorn)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=dindin23
+Group=dindin23
+WorkingDirectory=/home/dindin23/PersonalProjects/Karmine
+EnvironmentFile=/home/dindin23/PersonalProjects/Karmine/.env
+ExecStart=/home/dindin23/.cache/pypoetry/virtualenvs/karmine-teQBLjnL-py3.13/bin/uvicorn app.main:app --host 127.0.0.1 --port 8001
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

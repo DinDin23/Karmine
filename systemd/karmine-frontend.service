@@ -1,0 +1,16 @@
+[Unit]
+Description=Karmine frontend (static build via serve)
+After=network.target
+
+[Service]
+Type=simple
+User=dindin23
+Group=dindin23
+WorkingDirectory=/home/dindin23/PersonalProjects/Karmine/frontend
+Environment=PATH=/home/dindin23/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin
+ExecStart=/home/dindin23/PersonalProjects/Karmine/frontend/node_modules/.bin/serve dist -l 5174 --no-clipboard
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
