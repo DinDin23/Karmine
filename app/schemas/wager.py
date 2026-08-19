@@ -10,6 +10,8 @@ class WagerOut(BaseModel):
     id: int
     player1_id: int
     player2_id: int
+    player1_username: str
+    player2_username: str
     stake_amount: Decimal
     status: WagerStatus
     winner_id: int | None

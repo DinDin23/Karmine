@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
 import { deposit, getBalance, getTransactions, withdraw } from "./api";
+import { formatRelativeTime } from "./format";
+
+const TX_LABELS = {
+  deposit: "Deposit",
+  withdrawal: "Withdrawal",
+  wager_lock: "Wager Stake",
+  wager_payout: "Wager Payout",
+  wager_refund: "Wager Refund",
+};
 
 export default function Wallet({ onBalanceChanged }) {
   const [balance, setBalance] = useState(null);
@@ -76,9 +85,13 @@ export default function Wallet({ onBalanceChanged }) {
       ) : (
         <ul className="list">
           {transactions.map((tx) => (
-            <li key={tx.id}>
-              {tx.type} — {tx.amount > 0 ? "+" : ""}
-              {tx.amount} ({new Date(tx.created_at).toLocaleString()})
+            <li key={tx.id} className="tx-row">
+              <span className="tx-badge">{TX_LABELS[tx.type] ?? tx.type}</span>
+              <span className="tx-main">{tx.wager_id ? `Wager #${tx.wager_id}` : ""}</span>
+              <span className={Number(tx.amount) >= 0 ? "tx-amount matched" : "tx-amount error"}>
+                {Number(tx.amount) >= 0 ? "+" : "-"}${Math.abs(Number(tx.amount)).toFixed(2)}
+              </span>
+              <span className="tx-time">{formatRelativeTime(tx.created_at)}</span>
             </li>
           ))}
         </ul>

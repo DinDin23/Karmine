@@ -445,3 +445,94 @@ button:disabled {
   padding: 0.75rem 0;
 }
 
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text);
+  opacity: 0.65;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.wager-row,
+.tx-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.wager-main,
+.tx-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.tx-amount {
+  font-weight: 600;
+}
+
+.wager-time,
+.tx-time {
+  font-size: 0.8rem;
+  color: var(--text);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.outcome-badge,
+.tx-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tx-badge {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.outcome-win {
+  background: rgba(76, 175, 80, 0.15);
+  color: #4caf50;
+}
+
+.outcome-loss {
+  background: rgba(224, 85, 85, 0.15);
+  color: #e05555;
+}
+
+.outcome-refunded {
+  background: rgba(209, 154, 26, 0.15);
+  color: #d19a1a;
+}
+
+.outcome-pending {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+

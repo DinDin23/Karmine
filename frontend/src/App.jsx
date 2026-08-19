@@ -72,7 +72,7 @@ function App() {
         <div className="column">
           <UserStats userId={user.id} refreshKey={wagerRefreshKey} />
           <Wallet onBalanceChanged={() => setBalanceRefreshKey((k) => k + 1)} />
-          <WagerHistory refreshKey={wagerRefreshKey} />
+          <WagerHistory userId={user.id} refreshKey={wagerRefreshKey} />
         </div>
         <div className="column">
           <Matchmaking
