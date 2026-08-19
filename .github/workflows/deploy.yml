@@ -1,0 +1,38 @@
+name: Deploy to Pi
+
+# Fires on every push that lands on main -- including PRs merged via the
+# GitHub UI, which never touch the Pi locally. workflow_dispatch is there so
+# a deploy can be re-run by hand (e.g. to retry after fixing a transient
+# failure) without needing an empty commit.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Join tailnet
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-client-secret: ${{ secrets.TS_OAUTH_CLIENT_SECRET }}
+          tags: tag:ci
+
+      - name: Deploy over SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          echo "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          # The Pi's authorized_keys entry for this key forces it to always
+          # run scripts/deploy.sh regardless of what command is sent, so the
+          # command here is just documentation of intent.
+          ssh -o StrictHostKeyChecking=accept-new \
+              -i ~/.ssh/deploy_key \
+              dindin23@raspberrypi.taile6c1cc.ts.net \
+              "scripts/deploy.sh"
