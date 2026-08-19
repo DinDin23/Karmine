@@ -9,6 +9,7 @@ export default function AuthForm({ onAuthenticated }) {
   const [crPlayerTag, setCrPlayerTag] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [supercellIdLink, setSupercellIdLink] = useState("");
+  const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -66,13 +67,28 @@ export default function AuthForm({ onAuthenticated }) {
                 required
               />
             </label>
-            <p className="sms-consent">
-              By providing your phone number, you agree to receive SMS text
-              messages from Karmine, including your opponent's Clash Royale
-              friend link after a match. Message frequency varies. Message
-              and data rates may apply. Reply STOP to opt out at any time, or
-              HELP for help.
-            </p>
+            <label className="sms-consent">
+              <input
+                type="checkbox"
+                checked={smsConsent}
+                onChange={(e) => setSmsConsent(e.target.checked)}
+                required
+              />
+              <span>
+                I agree to receive SMS text messages from Karmine, including
+                my opponent's Clash Royale friend link after a match. Message
+                frequency varies. Message and data rates may apply. Reply
+                STOP to opt out at any time, or HELP for help. See our{" "}
+                <a href="/privacy.html" target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </a>{" "}
+                and{" "}
+                <a href="/terms.html" target="_blank" rel="noopener noreferrer">
+                  Terms of Service
+                </a>
+                .
+              </span>
+            </label>
             <label>
               Supercell ID Friend Link
               <input

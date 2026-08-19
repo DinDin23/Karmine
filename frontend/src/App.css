@@ -254,10 +254,46 @@ button:disabled {
 }
 
 .sms-consent {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.5rem;
   font-size: 0.8rem;
   color: var(--text);
-  opacity: 0.75;
+  opacity: 0.85;
   margin: -0.3rem 0 0;
+  cursor: pointer;
+}
+
+.sms-consent input[type="checkbox"] {
+  margin-top: 0.15rem;
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
+.sms-consent a {
+  color: var(--accent);
+}
+
+.landing-footer {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.7;
+}
+
+.landing-footer a {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.landing-footer a:hover {
+  color: var(--accent);
 }
 
 .balance {

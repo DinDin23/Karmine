@@ -47,6 +47,11 @@ function App() {
           <p className="tagline">Wager on your Clash Royale 1v1s. Queue up, get matched, get paid.</p>
         </div>
         <AuthForm onAuthenticated={handleAuthenticated} />
+        <footer className="landing-footer">
+          <a href="/privacy.html">Privacy Policy</a>
+          <span aria-hidden="true">·</span>
+          <a href="/terms.html">Terms of Service</a>
+        </footer>
       </div>
     );
   }
