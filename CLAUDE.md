@@ -69,6 +69,8 @@ Frontend talks to the backend via `VITE_API_BASE_URL` (`frontend/src/api.js`), d
 
 **Real-time updates:** `connection_manager.py` keeps an in-memory `{user_id: WebSocket}` map. Because the settlement worker runs on a background *thread* while the WebSocket lives on the asyncio event loop, `notify()` is thread-safe and uses `asyncio.run_coroutine_threadsafe` against a loop captured at startup (`set_loop`, called from the FastAPI lifespan). This in-memory map means multi-process/multi-instance deployment would need a different mechanism (e.g. Redis pub/sub) — currently it only works because the backend runs as a single process.
 
+**Static legal/opt-in pages:** `frontend/public/privacy.html`, `terms.html`, `sms-opt-in.html`, and their shared `legal.css` are plain static HTML/CSS, not React — Vite copies anything in `frontend/public/` verbatim into `dist/`, so these render standalone at `/privacy.html` etc. with no JS or login required. This exists because Twilio's Toll-Free Verification review needs a JS-free, business-branded page showing the SMS opt-in consent flow; the registration form's SMS-consent checkbox in `AuthForm.jsx` links to these same pages, and its wording should stay in sync with `sms-opt-in.html`'s demo form. Editing these means editing the static files directly — they aren't built from JSX and don't share `App.css`/`index.css` (tokens are hand-copied into `legal.css`).
+
 ## Deployment
 
 Deploys to a Raspberry Pi over Tailscale SSH, triggered by `.github/workflows/deploy.yml` on every push to `main` (or manually via `workflow_dispatch`). The Pi's `authorized_keys` forces the deploy key to always run `scripts/deploy.sh`, ignoring whatever command is actually sent over SSH.
