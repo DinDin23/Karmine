@@ -1,8 +1,15 @@
 import { useState } from "react";
 import { login, register } from "./api";
 
+function initialMode() {
+  if (typeof window === "undefined") return "login";
+  return new URLSearchParams(window.location.search).get("mode") === "register"
+    ? "register"
+    : "login";
+}
+
 export default function AuthForm({ onAuthenticated }) {
-  const [mode, setMode] = useState("login");
+  const [mode, setMode] = useState(initialMode);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,12 +27,20 @@ export default function AuthForm({ onAuthenticated }) {
     setSubmitting(true);
     try {
       if (mode === "register") {
+        if (smsConsent && !phoneNumber.trim()) {
+          setError(
+            "Enter a phone number to receive SMS match notifications, or uncheck the box.",
+          );
+          setSubmitting(false);
+          return;
+        }
         await register({
           username,
           email,
           password,
           cr_player_tag: crPlayerTag,
-          phone_number: phoneNumber,
+          phone_number: smsConsent && phoneNumber.trim() ? phoneNumber.trim() : null,
+          sms_consent: smsConsent,
           supercell_id_link: supercellIdLink,
         });
       }
@@ -57,38 +72,51 @@ export default function AuthForm({ onAuthenticated }) {
                 required
               />
             </label>
-            <label>
-              Phone Number
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+15551234567"
-                required
-              />
-            </label>
-            <label className="sms-consent">
-              <input
-                type="checkbox"
-                checked={smsConsent}
-                onChange={(e) => setSmsConsent(e.target.checked)}
-                required
-              />
-              <span>
-                I agree to receive SMS text messages from Karmine, including
-                my opponent's Clash Royale friend link after a match. Message
-                frequency varies. Message and data rates may apply. Reply
-                STOP to opt out at any time, or HELP for help. See our{" "}
-                <a href="/privacy.html" target="_blank" rel="noopener noreferrer">
-                  Privacy Policy
-                </a>{" "}
-                and{" "}
-                <a href="/terms.html" target="_blank" rel="noopener noreferrer">
-                  Terms of Service
-                </a>
-                .
-              </span>
-            </label>
+            <div className="sms-optin">
+              <p className="sms-optin-heading">
+                SMS match notifications &mdash; optional, not required to register
+              </p>
+              <label className="sms-consent">
+                <input
+                  type="checkbox"
+                  checked={smsConsent}
+                  onChange={(e) => setSmsConsent(e.target.checked)}
+                />
+                <span>
+                  <strong>Optional &mdash; not required to register.</strong> I
+                  agree to receive SMS text messages from Karmine, including my
+                  opponent's Clash Royale friend link after a match. Message
+                  frequency varies. Message and data rates may apply. Reply STOP
+                  to opt out at any time, or HELP for help. See our{" "}
+                  <a href="/privacy.html" target="_blank" rel="noopener noreferrer">
+                    Privacy Policy
+                  </a>
+                  ,{" "}
+                  <a href="/terms.html" target="_blank" rel="noopener noreferrer">
+                    Terms of Service
+                  </a>
+                  , and{" "}
+                  <a
+                    href="/sms-opt-in.html"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    SMS opt-in details
+                  </a>
+                  .
+                </span>
+              </label>
+              <label>
+                Phone Number (optional)
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="+15551234567"
+                  required={smsConsent}
+                />
+              </label>
+            </div>
             <label>
               Supercell ID Friend Link
               <input

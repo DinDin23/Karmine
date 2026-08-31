@@ -253,6 +253,27 @@ button:disabled {
   color: #e05555;
 }
 
+.sms-optin {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--border, rgba(255, 255, 255, 0.15));
+  border-radius: 8px;
+}
+
+.sms-optin-heading {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+.sms-optin .sms-consent {
+  margin: 0;
+}
+
 .sms-consent {
   display: flex;
   flex-direction: row;

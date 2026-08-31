@@ -41,6 +41,7 @@ export function register({
   password,
   cr_player_tag,
   phone_number,
+  sms_consent,
   supercell_id_link,
 }) {
   return request("/auth/register", {
@@ -52,6 +53,7 @@ export function register({
       password,
       cr_player_tag,
       phone_number,
+      sms_consent,
       supercell_id_link,
     }),
   });

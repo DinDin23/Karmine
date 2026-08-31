@@ -14,18 +14,15 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 def register(payload: UserCreate, db: Session = Depends(get_db)):
-    existing = (
-        db.query(User)
-        .filter(
-            or_(
-                User.email == payload.email,
-                User.username == payload.username,
-                User.cr_player_tag == payload.cr_player_tag,
-                User.phone_number == payload.phone_number,
-            )
-        )
-        .first()
-    )
+    uniqueness_filters = [
+        User.email == payload.email,
+        User.username == payload.username,
+        User.cr_player_tag == payload.cr_player_tag,
+    ]
+    if payload.phone_number:
+        uniqueness_filters.append(User.phone_number == payload.phone_number)
+
+    existing = db.query(User).filter(or_(*uniqueness_filters)).first()
     if existing is not None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -38,6 +35,7 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
         hashed_password=hash_password(payload.password),
         cr_player_tag=payload.cr_player_tag,
         phone_number=payload.phone_number,
+        sms_consent=payload.sms_consent,
         supercell_id_link=payload.supercell_id_link,
     )
     db.add(user)

@@ -16,7 +16,17 @@ _client = Client(
 
 
 def send_match_invite(user: User, opponent: User) -> None:
-    """Text a user their opponent's Supercell ID friend link after a match."""
+    """Text a user their opponent's Supercell ID friend link after a match.
+
+    No-op unless the user opted in to SMS and has a phone number on file; the
+    opponent's friend link is always available in-app regardless.
+    """
+    if not user.sms_consent or not user.phone_number:
+        logger.info(
+            "Skipping match invite SMS for user %s (no consent / no phone)", user.id
+        )
+        return
+
     body = (
         f"Karmine: You've been matched with {opponent.username}! "
         f"Add them in Clash Royale: {opponent.supercell_id_link}"

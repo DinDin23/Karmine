@@ -36,6 +36,12 @@
         SMS program is used solely to send event-related match notifications
         to users who have opted in to be matched for games.
       </p>
+      <p>
+        Opting in to SMS is <strong>optional and is not required to create a
+        Karmine account</strong>. If you don't opt in, your opponent's friend
+        link is still shown to you inside the app after each match — you just
+        won't receive it by text.
+      </p>
 
       <div class="card">
         <h2 style="margin-top: 0">Example: Registration Consent Step</h2>
@@ -46,21 +52,25 @@
           anywhere. To register for real, use the button below.
         </p>
         <form class="demo-form" id="demo-opt-in">
-          <label>
-            Phone Number
-            <input type="tel" placeholder="+15551234567" />
-          </label>
+          <p class="demo-note" style="margin: 0; font-weight: 600">
+            SMS match notifications — optional, not required to register
+          </p>
           <label class="consent-check">
-            <input type="checkbox" id="demo-consent" required />
+            <input type="checkbox" id="demo-consent" />
             <span>
-              I agree to receive SMS text messages from Karmine, including my
-              opponent's Clash Royale friend link after a match. Message
-              frequency varies. Message and data rates may apply. Reply STOP
-              to opt out at any time, or HELP for help. See our
+              <strong>Optional — not required to register.</strong> I agree to
+              receive SMS text messages from Karmine, including my opponent's
+              Clash Royale friend link after a match. Message frequency varies.
+              Message and data rates may apply. Reply STOP to opt out at any
+              time, or HELP for help. See our
               <a href="/privacy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
               and
               <a href="/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a>.
             </span>
+          </label>
+          <label>
+            Phone Number (optional)
+            <input type="tel" placeholder="+15551234567" />
           </label>
           <button type="submit">Continue</button>
         </form>

@@ -74,6 +74,7 @@ def seed_users(db, fake: Faker, count: int) -> list[User]:
             hashed_password=hash_password(SEED_PASSWORD),
             cr_player_tag="#" + fake.unique.bothify(text="????????").upper(),
             phone_number=fake.unique.numerify("+1##########"),
+            sms_consent=True,
             supercell_id_link=f"https://link.clashroyale.com/invite/friend/en?tag={fake.bothify('??????')}",
         )
         db.add(user)
