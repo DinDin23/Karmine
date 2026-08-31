@@ -8,7 +8,8 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     cr_player_tag: str
-    phone_number: str
+    phone_number: str | None = None
+    sms_consent: bool = False
     supercell_id_link: str
 
 
@@ -17,7 +18,8 @@ class UserOut(BaseModel):
     username: str
     email: EmailStr
     cr_player_tag: str
-    phone_number: str
+    phone_number: str | None = None
+    sms_consent: bool
     supercell_id_link: str
     created_at: datetime
 
