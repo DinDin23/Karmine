@@ -73,9 +73,7 @@ export default function AuthForm({ onAuthenticated }) {
               />
             </label>
             <div className="sms-optin">
-              <p className="sms-optin-heading">
-                SMS match notifications &mdash; optional, not required to register
-              </p>
+              <p className="sms-optin-heading">SMS match notifications</p>
               <label className="sms-consent">
                 <input
                   type="checkbox"
@@ -85,7 +83,7 @@ export default function AuthForm({ onAuthenticated }) {
                 <span>
                   <strong>Optional &mdash; not required to register.</strong> I
                   agree to receive SMS text messages from Karmine, including my
-                  opponent's Clash Royale friend link after a match. Message
+                  opponent's Clash Royale friend link before the match. Message
                   frequency varies. Message and data rates may apply. Reply STOP
                   to opt out at any time, or HELP for help. See our{" "}
                   <a href="/privacy.html" target="_blank" rel="noopener noreferrer">
@@ -107,7 +105,7 @@ export default function AuthForm({ onAuthenticated }) {
                 </span>
               </label>
               <label>
-                Phone Number (optional)
+                Phone Number
                 <input
                   type="tel"
                   value={phoneNumber}
