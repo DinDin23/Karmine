@@ -6,7 +6,7 @@
       "Bash(rm -rf */PersonalProjects/Karmine/*)",
       "Bash(mv */PersonalProjects/Karmine/* *)",
       "Bash(find */PersonalProjects/Karmine/* -delete)",
-      "Bash(find */PersonalProjects/Karmine/* -exec rm *)",
+      "Bash(find /home/dindin23/PersonalProjects/Karmine -exec rm *)",
       "Bash(*)",
       "WebSearch",
       "WebFetch(*)",
