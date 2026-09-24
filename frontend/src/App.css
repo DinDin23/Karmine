@@ -251,6 +251,50 @@ button:disabled {
 
 .error {
   color: #e05555;
+  white-space: pre-line;
+}
+
+.field-error {
+  margin: 0;
+  color: #e05555;
+  font-size: 0.8rem;
+}
+
+input[aria-invalid="true"] {
+  border-color: #e05555;
+}
+
+.field-with-help {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.help-steps {
+  font-size: 0.8rem;
+}
+
+.help-steps summary {
+  cursor: pointer;
+  width: fit-content;
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.help-steps ol {
+  margin: 0.4rem 0;
+  padding-left: 1.2rem;
+}
+
+.help-steps li + li {
+  margin-top: 0.2rem;
+}
+
+.help-steps img {
+  display: block;
+  max-width: min(260px, 100%);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
 .sms-optin {

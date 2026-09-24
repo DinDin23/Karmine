@@ -39,6 +39,7 @@ from app.models.matchmaking_request import MatchmakingRequest  # noqa: E402,F401
 from app.models.transaction import Transaction, TransactionType  # noqa: E402
 from app.models.user import User  # noqa: E402
 from app.models.wager import Wager, WagerStatus  # noqa: E402
+from app.schemas.auth import CR_TAG_CHARS  # noqa: E402
 
 from faker import Faker  # noqa: E402
 
@@ -72,10 +73,13 @@ def seed_users(db, fake: Faker, count: int) -> list[User]:
             username=fake.unique.user_name()[:32],
             email=fake.unique.email(),
             hashed_password=hash_password(SEED_PASSWORD),
-            cr_player_tag="#" + fake.unique.bothify(text="????????").upper(),
+            cr_player_tag="#" + fake.unique.lexify("????????", letters=CR_TAG_CHARS),
             phone_number=fake.unique.numerify("+1##########"),
             sms_consent=True,
-            supercell_id_link=f"https://link.clashroyale.com/invite/friend/en?tag={fake.bothify('??????')}",
+            supercell_id_link=(
+                "https://link.clashroyale.com/?supercell_id"
+                f"&p={random.randint(1, 99)}-{fake.uuid4()}"
+            ),
         )
         db.add(user)
         users.append(user)
