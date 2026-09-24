@@ -15,6 +15,21 @@ log() { echo "[deploy $(date -Iseconds)] $*"; }
 
 cd "$REPO_DIR"
 
+# This checkout doubles as a dev checkout, so refuse to deploy from anything
+# but a clean `main`: merging origin/main into a feature branch either fails
+# confusingly (squash-merged branches can't fast-forward) or would put
+# unmerged code live. Untracked files are ignored.
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$BRANCH" != "main" ]; then
+    log "ERROR: $REPO_DIR is on branch '$BRANCH', not main -- run 'git checkout main' on the Pi, then re-run the deploy"
+    exit 1
+fi
+if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+    log "ERROR: $REPO_DIR has uncommitted changes to tracked files -- commit or stash them on the Pi, then re-run the deploy:"
+    git status --short --untracked-files=no
+    exit 1
+fi
+
 OLD_HEAD=$(git rev-parse HEAD)
 log "current HEAD: $OLD_HEAD"
 
