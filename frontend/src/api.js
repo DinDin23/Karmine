@@ -13,6 +13,18 @@ export function setToken(token) {
   }
 }
 
+// FastAPI validation errors (422) come back as a list of {loc, msg, ...};
+// show just the messages, minus pydantic's "Value error, " prefix.
+function formatDetail(detail) {
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((err) => String(err?.msg ?? err).replace(/^Value error, /, ""))
+      .join("\n");
+  }
+  return JSON.stringify(detail);
+}
+
 async function request(path, options = {}) {
   const token = getToken();
   const headers = { ...(options.headers || {}) };
@@ -28,7 +40,7 @@ async function request(path, options = {}) {
     } catch {
       // no JSON body
     }
-    throw new Error(typeof detail === "string" ? detail : JSON.stringify(detail));
+    throw new Error(formatDetail(detail));
   }
 
   if (response.status === 204) return null;
