@@ -1,3 +1,6 @@
+import logging
+
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import or_
@@ -8,6 +11,9 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.auth import Token, UserCreate, UserOut
+from app.services import cr_api_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -27,6 +33,22 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Username, email, CR player tag, or phone number already registered",
+        )
+
+    # A well-formed but mistyped tag would register fine and then never settle,
+    # so confirm the player actually exists. Fail closed if the CR API can't answer.
+    try:
+        tag_exists = cr_api_service.player_exists(payload.cr_player_tag)
+    except httpx.HTTPError:
+        logger.exception("CR API player lookup failed for %s", payload.cr_player_tag)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Couldn't verify your Clash Royale player tag right now. Please try again shortly.",
+        )
+    if not tag_exists:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"No Clash Royale player found with tag {payload.cr_player_tag}. Double-check it in your in-game profile.",
         )
 
     user = User(
